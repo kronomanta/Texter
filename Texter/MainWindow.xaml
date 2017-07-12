@@ -1,0 +1,51 @@
+﻿<Window x:Class="Texter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Texter"
+        mc:Ignorable="d"
+        Title="Texter" 
+        MinWidth="50"
+        MaxWidth="300"
+        
+        Width="300"
+        
+        SizeToContent="Height"
+        Padding="5"
+        Topmost="True"
+        WindowStyle="SingleBorderWindow"
+        SizeChanged="Window_SizeChanged">
+
+    <Expander Header="DoTheMagicBarrelRoll" IsExpanded="False" Name="Expander">
+
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top">
+                <Button DockPanel.Dock="Right" Content=" + " Click="AddNewItemEvent" Margin="5,0,0,5" />
+                <TextBox AcceptsReturn="True" AcceptsTab="True" Name="InputText"
+                     HorizontalAlignment="Stretch" MaxHeight="400"
+                     TextWrapping="Wrap"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     />
+            </DockPanel>
+
+            <ListView DockPanel.Dock="Top" Name="TextList" SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemTemplate>
+                    <DataTemplate >
+                        <Grid x:Name="Element" Height="23">
+                            <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis"/>
+                            <Button Content="X" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Top" x:Name="RemoveButton" Click="OnRemoveEvent" Width="20" Height="20" Visibility="Collapsed"/>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
+                                <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
+                            </Trigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </DockPanel>
+    </Expander>
+
+</Window>
