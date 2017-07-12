@@ -16,7 +16,7 @@ namespace Texter
         /// Send the content of the clipboard to the active window. This app must be minimized before using this method
         /// </summary>
         /// <param name="text"></param>
-        public static IntPtr PasteText(string text)
+        public static async System.Threading.Tasks.Task<IntPtr> PasteText(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return IntPtr.Zero;
             
@@ -27,6 +27,8 @@ namespace Texter
             System.Windows.Clipboard.SetDataObject(text);
 
             System.Windows.Forms.SendKeys.SendWait("^v");
+            await System.Threading.Tasks.Task.Run(() => System.Threading.Thread.Sleep(100));
+
             System.Windows.Clipboard.SetDataObject(clipboard);
 
             return hWnd;

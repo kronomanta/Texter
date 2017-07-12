@@ -18,7 +18,6 @@ namespace Texter
             InitializeComponent();
             try
             {
-
                 EventManager.RegisterClassHandler(typeof(ListBoxItem), MouseLeftButtonDownEvent, new RoutedEventHandler(TextItemClicked));
             }
             catch (Exception ex)
@@ -43,7 +42,7 @@ namespace Texter
             _textItems.Remove(textItem);
         }
 
-        private void TextItemClicked(object sender, RoutedEventArgs e)
+        private async void TextItemClicked(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -51,16 +50,18 @@ namespace Texter
                 if (textItem == null) return;
                 this.Expander.IsExpanded = false;
 
-                Hide();
                 WindowState windowState = WindowState;
+
+                Hide();
                 WindowState = WindowState.Minimized;
-                IntPtr targetWindow = Win32Wrapper.PasteText(textItem.Text);
+                await System.Threading.Tasks.Task.Run(() => System.Threading.Thread.Sleep(200));
+
+                IntPtr targetWindow = await Win32Wrapper.PasteText(textItem.Text);
 
                 WindowState = windowState;
                 Show();
 
                 Win32Wrapper.SetForegroundWindow(targetWindow);
-
             }
             catch (Exception ex)
             {
