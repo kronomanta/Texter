@@ -12,40 +12,88 @@
         Width="300"
         
         SizeToContent="Height"
-        Padding="5"
         Topmost="True"
-        WindowStyle="SingleBorderWindow"
-        SizeChanged="Window_SizeChanged">
+        WindowStyle="None"
+        SizeChanged="Window_SizeChanged"
+        AllowsTransparency="True"
+        >
 
-    <Expander Header="DoTheMagicBarrelRoll" IsExpanded="False" Name="Expander">
+    <Window.Background>
+        <SolidColorBrush Opacity="0" />
+    </Window.Background>
+    <Border Opacity="0.2" BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
+        <Border.Triggers>
+            
+            <EventTrigger RoutedEvent="Control.MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard >
+                        <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetProperty="Opacity"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentHolder" Storyboard.TargetProperty="(UIElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Collapsed}"/>
+                            <DiscreteObjectKeyFrame KeyTime="00:00:0.2" Value="{x:Static Visibility.Visible}"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="Control.MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard >
+                        <DoubleAnimation Duration="0:0:0.2" To="0.2" Storyboard.TargetProperty="Opacity"/>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentHolder" Storyboard.TargetProperty="(UIElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="00:00:0" Value="{x:Static Visibility.Visible}"/>
+                            <DiscreteObjectKeyFrame KeyTime="00:00:0.2" Value="{x:Static Visibility.Collapsed}"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Border.Triggers>
 
-        <DockPanel>
-            <DockPanel DockPanel.Dock="Top">
-                <Button DockPanel.Dock="Right" Content=" + " Click="AddNewItemEvent" Margin="5,0,0,5" />
-                <TextBox AcceptsReturn="True" AcceptsTab="True" Name="InputText"
+
+        <DockPanel >
+            
+            <Grid DockPanel.Dock="Top" MouseDown="Expander_MouseDown" Margin="0,0,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Texter" FontWeight="Bold" />
+                <Button Content="X" Background="Red" Grid.Column="1" Height="20" Width="20" Click="CloseButtonClicked"/>
+            </Grid>
+
+            <DockPanel DockPanel.Dock="Top" Name="ContentHolder" Visibility="Collapsed" >
+                <DockPanel DockPanel.Dock="Top">
+                    <Button DockPanel.Dock="Right" Content=" + " Click="AddNewItemClicked" Margin="5,0,0,5" />
+                    <TextBox AcceptsReturn="True" AcceptsTab="True" Name="InputText"
                      HorizontalAlignment="Stretch" MaxHeight="400"
                      TextWrapping="Wrap"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      />
+                </DockPanel>
+
+                <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" Name="KeepOnClipboardAfterInsert" Content="Vágólapon tart" IsThreeState="False"/>
+
+                <ListView DockPanel.Dock="Top" Name="TextList" SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListView.ItemTemplate>
+                        <DataTemplate >
+                            <Grid x:Name="Element" Height="23">
+                                <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis"/>
+                                <Button Content="X" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Top" x:Name="RemoveButton" Click="RemoveItemClicked" Width="20" Height="20" Visibility="Collapsed"/>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
+                                    <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
+                                </Trigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <ResizeGrip DockPanel.Dock="Bottom" HorizontalAlignment="Right" Cursor="ScrollWE"
+                        PreviewMouseDown="ResizeGrip_PreviewMouseDown"/>
             </DockPanel>
 
-            <ListView DockPanel.Dock="Top" Name="TextList" SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemTemplate>
-                    <DataTemplate >
-                        <Grid x:Name="Element" Height="23">
-                            <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis"/>
-                            <Button Content="X" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Top" x:Name="RemoveButton" Click="OnRemoveEvent" Width="20" Height="20" Visibility="Collapsed"/>
-                        </Grid>
-                        <DataTemplate.Triggers>
-                            <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
-                                <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
-                            </Trigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-
+          
         </DockPanel>
-    </Expander>
+    </Border>
 
 </Window>

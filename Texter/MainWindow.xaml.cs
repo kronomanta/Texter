@@ -12,10 +12,12 @@ namespace Texter
     public partial class MainWindow
     {
         private ObservableCollection<TextItem> _textItems;
+        private IntPtr _windowHandle;
 
         public MainWindow()
         {
             InitializeComponent();
+            
             try
             {
                 EventManager.RegisterClassHandler(typeof(ListBoxItem), MouseLeftButtonDownEvent, new RoutedEventHandler(TextItemClicked));
@@ -25,17 +27,18 @@ namespace Texter
                 string error = "Sikertelen az alkalmazás inicializálása. Kérem, indítsa újra. [ERR400]";
                 LogHelper.LogException(ex, error);
                 MessageBox.Show(error);
+                Close();
             }
         }
 
-        private void AddNewItemEvent(object sender, RoutedEventArgs e)
+        private void AddNewItemClicked(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(InputText.Text)) return;
             _textItems.Add(new TextItem { Text = InputText.Text });
             InputText.Text = null;
         }
 
-        private void OnRemoveEvent(object sender, RoutedEventArgs e)
+        private void RemoveItemClicked(object sender, RoutedEventArgs e)
         {
             TextItem textItem = (sender as FrameworkElement)?.DataContext as TextItem;
             if (textItem == null) return;
@@ -48,7 +51,6 @@ namespace Texter
             {
                 TextItem textItem = (sender as ListBoxItem)?.DataContext as TextItem;
                 if (textItem == null) return;
-                this.Expander.IsExpanded = false;
 
                 WindowState windowState = WindowState;
 
@@ -56,7 +58,7 @@ namespace Texter
                 WindowState = WindowState.Minimized;
                 await System.Threading.Tasks.Task.Run(() => System.Threading.Thread.Sleep(200));
 
-                IntPtr targetWindow = await Win32Wrapper.PasteText(textItem.Text);
+                IntPtr targetWindow = await Win32Wrapper.PasteText(textItem.Text, KeepOnClipboardAfterInsert.IsChecked.Value);
 
                 WindowState = windowState;
                 Show();
@@ -92,7 +94,6 @@ namespace Texter
 
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e);
 
             try
             {
@@ -102,6 +103,32 @@ namespace Texter
             {
                 LogHelper.LogException(ex);
             }
+
+            base.OnClosed(e);
+        }
+
+        private void Expander_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
+
+        private void CloseButtonClicked(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            _windowHandle = ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).Handle;
+        }
+
+        private void ResizeGrip_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Win32Wrapper.ResizeWindow(_windowHandle, Win32Wrapper.ResizeDirection.Right);
         }
     }
 }
