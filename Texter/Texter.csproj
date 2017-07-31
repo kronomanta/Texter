@@ -37,6 +37,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\gong-wpf-dragdrop.1.1.0\lib\net45\GongSolutions.Wpf.DragDrop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
@@ -73,11 +77,12 @@
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\LogHelper.cs" />
-    <Compile Include="TextItem.cs" />
+    <Compile Include="ViewModels\TextItem.cs" />
     <Compile Include="ViewModels\GroupItem.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\TextManager.cs" />
     <Compile Include="ViewModels\TextManagerViewModel.Commands.cs" />
+    <Compile Include="ViewModels\TextManagerViewModel.DragDrop.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="View\Confirmer.cs" />
     <Compile Include="Win32Wrapper.cs" />

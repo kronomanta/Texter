@@ -6,7 +6,7 @@
         public RelayCommand AddGroupCommand => _addGroupCommand ?? (_addGroupCommand = new RelayCommand(AddGroup, () => !string.IsNullOrWhiteSpace(GroupInput)));
 
         private RelayCommand _addTextCommand;
-        public RelayCommand AddTextCommand => _addTextCommand ?? (_addTextCommand = new RelayCommand(AddText, () => !string.IsNullOrWhiteSpace(TextInput) && SelectedGroupID.HasValue));
+        public RelayCommand AddTextCommand => _addTextCommand ?? (_addTextCommand = new RelayCommand(AddText, () => !string.IsNullOrWhiteSpace(TextInput)));
 
         private RelayCommand<GroupItem> _removeGroupItemCommand;
         public RelayCommand<GroupItem> RemoveGroupItemCommand => _removeGroupItemCommand ?? (_removeGroupItemCommand = new RelayCommand<GroupItem>(RemoveGroupItem, gi => gi != null));

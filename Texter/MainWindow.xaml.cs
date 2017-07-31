@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 using Texter.Intefaces;
 using Texter.Logger;
 using Texter.View;
@@ -36,45 +36,21 @@ namespace Texter
 
         private void Subscribe()
         {
-            EventManager.RegisterClassHandler(typeof(ListBoxItem), MouseLeftButtonDownEvent, new RoutedEventHandler(TextItemClicked));
-
             Header.MouseDown += HeaderMouserLeftDown;
 
             CloseButton.Click += CloseButtonClicked;
             ResizedGrip.PreviewMouseDown += ResizeGripPreviewMouseDown;
+            ResizedGrip.PreviewMouseUp += ResizeGripPreviewMouseUp;
         }
-
+        
         private void Unsubcribe()
         {
             Header.MouseDown -= HeaderMouserLeftDown;
 
             CloseButton.Click -= CloseButtonClicked;
             ResizedGrip.PreviewMouseDown -= ResizeGripPreviewMouseDown;
-        }
-        
-        private void TextItemClicked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                //TODO
-                TextItem textItem = (sender as ListBoxItem)?.DataContext as TextItem;
+            ResizedGrip.PreviewMouseUp -= ResizeGripPreviewMouseUp;
 
-                var pasteCommand = ((TextManagerViewModel)DataContext).PasteFromClipboardCommand;
-                if (pasteCommand.CanExecute(textItem))
-                    pasteCommand.Execute(textItem);
-            }
-            catch (Exception ex)
-            {
-                string error = "Sikertelen a szöveg beillesztése. [ERR202]";
-                LogHelper.LogException(ex, error);
-                MessageBox.Show(error);
-            }
-
-        }
-
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            SizeToContent = System.Windows.SizeToContent.Height;
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -124,9 +100,16 @@ namespace Texter
             Win32Wrapper.ResizeWindow(_windowHandle, Win32Wrapper.ResizeDirection.Right);
         }
 
+
+        private void ResizeGripPreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            SizeToContent = SizeToContent.Height;
+        }
+
+
         private void HeaderMouserLeftDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed)
                 DragMove();
         }
         
@@ -144,5 +127,6 @@ namespace Texter
             Hide();
             WindowState = WindowState.Minimized;
         }
+
     }
 }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Texter"
+        
         mc:Ignorable="d"
         Title="Texter" 
         MinWidth="50"
@@ -14,8 +15,9 @@
         SizeToContent="Height"
         Topmost="True"
         WindowStyle="None"
-        SizeChanged="Window_SizeChanged"
         AllowsTransparency="True"
+        
+        xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         >
 
     <Window.Background>
@@ -39,8 +41,34 @@
             <Setter Property="Height" Value="20" />
             <Setter Property="Visibility" Value="Collapsed" />
         </Style>
+
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}" x:Key="TextButton" >
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock Text="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
+                                       ToolTip="{TemplateBinding Content}"
+                                       TextTrimming="CharacterEllipsis"/>
+
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Command" Value="{Binding Path=DataContext.PasteFromClipboardCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
+        </Style>
+
+        <CollectionViewSource x:Key="GroupedTextItems" Source="{Binding Path=TextItems}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="GroupName" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+
     </Window.Resources>
-    
+
     <Border Opacity="0.2" BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
         <Border.Triggers>
 
@@ -87,11 +115,10 @@
                         <ContentControl Grid.ColumnSpan="2" Content="{Binding Path=GroupItems}">
                             <ContentControl.ContentTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid VerticalAlignment="Center" Margin="0,0,0,3">
                                         <ComboBox x:Name="cb" ItemsSource="{Binding}"
                                                   DisplayMemberPath="Text" 
-                                                  SelectedValuePath="ID" 
-                                                  SelectedValue="{Binding Path=DataContext.SelectedGroupID, ElementName=ClipboardManager}"/>
+                                                  SelectedItem="{Binding Path=DataContext.SelectedGroup, ElementName=ClipboardManager}"/>
                                         <TextBlock x:Name="tb" Text="Válasszon csoportot" IsHitTestVisible="False" Visibility="Hidden"/>
                                     </Grid>
                                     <DataTemplate.Triggers>
@@ -114,17 +141,52 @@
                     <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" IsChecked="{Binding Path=KeepOnClipboardAfterInsert}" Content="Vágólapon tart" IsThreeState="False"/>
 
                     <ListView DockPanel.Dock="Top" 
-                              ItemsSource="{Binding Path=TextItems}"
-                              SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                              ItemsSource="{Binding Source={StaticResource GroupedTextItems}}"
+                              SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              dd:DragDrop.IsDragSource="True"
+                              dd:DragDrop.IsDropTarget="True" 
+                              dd:DragDrop.DropTargetAdornerBrush="Coral"
+                              dd:DragDrop.DragDirectlySelectedOnly="True"
+                              dd:DragDrop.UseDefaultDragAdorner="True"
+                              dd:DragDrop.DropHandler="{Binding}"
+                              IsSynchronizedWithCurrentItem="False"
+                              >
+                        <ListView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.ContainerStyle>
+                                    <Style TargetType="{x:Type GroupItem}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                    <Expander IsExpanded="True" BorderBrush="#FFA4B97F" BorderThickness="0,0,0,1" Margin="2">
+                                                        <Expander.Header>
+                                                            <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" Margin="5,0,0,0" ToolTip="{Binding Path=Name}"/>
+                                                        </Expander.Header>
+                                                        <Expander.Content>
+                                                            <ItemsPresenter />
+                                                        </Expander.Content>
+                                                    </Expander>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </GroupStyle.ContainerStyle>
+                            </GroupStyle>
+                        </ListView.GroupStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate >
-                                <Grid x:Name="Element" Height="23">
-                                    <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Text}"/>
-                                    <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
+                                <Border BorderBrush="#e6e6e6" BorderThickness="1" Padding="0" Margin="0">
+
+                                    <Grid x:Name="Element" Height="28">
+                                        <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text}"/>
+
+                                        <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
                                             Command="{Binding Path=DataContext.RemoveItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" 
                                             CommandParameter="{Binding Path=.}"
+                                            VerticalAlignment="Center"
                                             />
-                                </Grid>
+                                    </Grid>
+                                </Border>
                                 <DataTemplate.Triggers>
                                     <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
                                         <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
@@ -150,16 +212,24 @@
                               ItemsSource="{Binding Path=GroupItems}"
                               SelectionMode="Single" 
                               HorizontalContentAlignment="Stretch" 
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              IsSynchronizedWithCurrentItem="False"
+                              >
                         <ListView.ItemTemplate>
                             <DataTemplate >
-                                <Grid x:Name="Element" Height="23">
-                                    <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Text}"/>
-                                    <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
+                                <Border BorderBrush="#e6e6e6" BorderThickness="1" >
+
+                                    <Grid x:Name="Element" Height="28">
+                                        <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Text}"/>
+
+                                        <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
                                             Command="{Binding Path=DataContext.RemoveGroupItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" 
                                             CommandParameter="{Binding Path=.}"
+                                                VerticalAlignment="Center"
                                             />
-                                </Grid>
+                                    </Grid>
+                                </Border>
+
                                 <DataTemplate.Triggers>
                                     <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
                                         <Setter Property="Visibility" Value="Visible" TargetName="RemoveGroupButton"/>

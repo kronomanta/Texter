@@ -10,7 +10,6 @@ namespace Texter.ViewModels
     {
         private readonly IConfirmer _confirmer;
         private readonly IWindowBase _window;
-        private int _groupIdCounter = 0;
 
         private ObservableCollection<TextItem> _textItems;
         public ObservableCollection<TextItem> TextItems
@@ -37,14 +36,14 @@ namespace Texter.ViewModels
             }
         }
 
-        private int? _selectedGroupID;
-        public int? SelectedGroupID
+        private GroupItem _selectedGroup;
+        public GroupItem SelectedGroup
         {
-            get { return _selectedGroupID; }
+            get { return _selectedGroup; }
             set
             {
-                if (_selectedGroupID == value) return;
-                _selectedGroupID = value;
+                if (_selectedGroup == value) return;
+                _selectedGroup = value;
                 OnPropertyChanged();
                 AddTextCommand.RaiseCanExecuteChanged();
             }
@@ -52,10 +51,11 @@ namespace Texter.ViewModels
 
         private string _textInput;
         public string TextInput
-        { get { return _textInput; }
-        set
+        {
+            get { return _textInput; }
+            set
             {
-                 if (_textInput == value) return;
+                if (_textInput == value) return;
                 _textInput = value;
                 OnPropertyChanged();
                 AddTextCommand.RaiseCanExecuteChanged();
@@ -79,7 +79,9 @@ namespace Texter.ViewModels
         public bool KeepOnClipboardAfterInsert
         {
             get { return _keepOnClipboardAfterInsert; }
-            set { if (_keepOnClipboardAfterInsert == value) return;
+            set
+            {
+                if (_keepOnClipboardAfterInsert == value) return;
                 _keepOnClipboardAfterInsert = value;
                 OnPropertyChanged();
             }
@@ -93,10 +95,10 @@ namespace Texter.ViewModels
 
         private void AddText()
         {
-            if (string.IsNullOrWhiteSpace(TextInput) || SelectedGroupID == null) return;
-            TextItems.Add(new TextItem { Text = TextInput, GroupID = SelectedGroupID.Value });
+            if (string.IsNullOrWhiteSpace(TextInput)) return;
+            TextItems.Add(new TextItem(TextInput, SelectedGroup));
             TextInput = null;
-            SelectedGroupID = null;
+            SelectedGroup = null;
         }
 
         private void RemoveText(TextItem item)
@@ -108,7 +110,10 @@ namespace Texter.ViewModels
         private void AddGroup()
         {
             if (string.IsNullOrWhiteSpace(GroupInput)) return;
-            GroupItems.Add(new GroupItem { Text = GroupInput, ID = _groupIdCounter++ });
+
+            if (GetGroupByName(GroupInput) == null)
+                GroupItems.Add(new GroupItem { Text = GroupInput });
+
             GroupInput = null;
         }
 
@@ -117,13 +122,13 @@ namespace Texter.ViewModels
             if (item == null) return;
 
             bool confirmed = true;
-            if (TextItems.Any(x => x.GroupID == item.ID))
+            if (TextItems.Any(x => x.GroupName == item.Text))
                 confirmed = _confirmer.ConfirmYesNo($"Tartozik elem ehhez a csoporthoz: {item.Text}. Mégis törli?", "Kapcsolódó elemek törlése");
 
             if (confirmed)
             {
                 GroupItems.Remove(item);
-                TextItems = new ObservableCollection<TextItem>(TextItems.Where(x => x.GroupID != item.ID));
+                TextItems = new ObservableCollection<TextItem>(TextItems.Where(x => x.GroupName != item.Text));
             }
         }
 
@@ -171,7 +176,7 @@ namespace Texter.ViewModels
             {
                 config = System.Threading.Tasks.Task.Run(async () => await FileManager.LoadConfigAsync<Config>()).Result ?? new Config();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 config = new Config();
                 LogHelper.LogException(ex);
@@ -179,9 +184,12 @@ namespace Texter.ViewModels
 
             GroupItems = new ObservableCollection<GroupItem>(config.GroupItems ?? new GroupItem[0]);
             TextItems = new ObservableCollection<TextItem>(config.TextItems ?? new TextItem[0]);
+        }
 
-            if (GroupItems.Count > 0)
-                _groupIdCounter = GroupItems[GroupItems.Count - 1].ID;
+        private GroupItem GetGroupByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            return GroupItems.SingleOrDefault(x => x.Text.ToLower() == name.ToLower());
         }
     }
 }
