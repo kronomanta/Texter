@@ -21,9 +21,29 @@
     <Window.Background>
         <SolidColorBrush Opacity="0" />
     </Window.Background>
+    <Window.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="AcceptsTab" Value="True"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="MaxHeight" Value="400"/>
+        </Style>
+
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}" x:Key="RemoveButton">
+            <Setter Property="Content" Value="X" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+    </Window.Resources>
+    
     <Border Opacity="0.2" BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
         <Border.Triggers>
-            
+
             <EventTrigger RoutedEvent="Control.MouseEnter">
                 <BeginStoryboard>
                     <Storyboard >
@@ -40,7 +60,7 @@
             </EventTrigger>
         </Border.Triggers>
 
-        <DockPanel >
+        <DockPanel LastChildFill="False" >
             <Grid Margin="0,0,0,5" Name="Header" DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -52,26 +72,58 @@
             </Grid>
 
 
-            <Expander HorizontalAlignment="Stretch" Name="Expander" DockPanel.Dock="Top" Header="Vágólapkezelés" >
-                
+            <Expander DockPanel.Dock="Top" Header="Vágólapkezelés" x:Name="ClipboardManager">
                 <DockPanel >
-                    <DockPanel DockPanel.Dock="Top">
-                        <Button DockPanel.Dock="Right" Content=" + " Name="NewItemButton" Margin="5,0,0,5" IsDefault="True"/>
-                        <TextBox AcceptsTab="True" Name="InputText"
-                     HorizontalAlignment="Stretch" MaxHeight="400"
-                     TextWrapping="Wrap"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     />
-                    </DockPanel>
+                    <Grid DockPanel.Dock="Top">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" Name="KeepOnClipboardAfterInsert" Content="Vágólapon tart" IsThreeState="False"/>
+                        <ContentControl Grid.ColumnSpan="2" Content="{Binding Path=GroupItems}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <ComboBox x:Name="cb" ItemsSource="{Binding}"
+                                                  DisplayMemberPath="Text" 
+                                                  SelectedValuePath="ID" 
+                                                  SelectedValue="{Binding Path=DataContext.SelectedGroupID, ElementName=ClipboardManager}"/>
+                                        <TextBlock x:Name="tb" Text="Válasszon csoportot" IsHitTestVisible="False" Visibility="Hidden"/>
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+                                        <Trigger SourceName="cb" Property="SelectedItem" Value="{x:Null}">
+                                            <Setter TargetName="tb" Property="Visibility" Value="Visible"/>
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
 
-                    <ListView DockPanel.Dock="Top" Name="TextList" SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <TextBox Grid.Row="1"
+                                 Grid.Column="0"
+                                 Text="{Binding Path=TextInput, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Grid.Row="1" Grid.Column="1" Content=" + " Command="{Binding Path=AddTextCommand}" Margin="5,0,0,5" IsDefault="True"/>
+
+
+                    </Grid>
+
+                    <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" IsChecked="{Binding Path=KeepOnClipboardAfterInsert}" Content="Vágólapon tart" IsThreeState="False"/>
+
+                    <ListView DockPanel.Dock="Top" 
+                              ItemsSource="{Binding Path=TextItems}"
+                              SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListView.ItemTemplate>
                             <DataTemplate >
                                 <Grid x:Name="Element" Height="23">
                                     <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Text}"/>
-                                    <Button Content="X" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Top" x:Name="RemoveButton" Click="RemoveItemClicked" Width="20" Height="20" Visibility="Collapsed"/>
+                                    <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
+                                            Command="{Binding Path=DataContext.RemoveItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" 
+                                            CommandParameter="{Binding Path=.}"
+                                            />
                                 </Grid>
                                 <DataTemplate.Triggers>
                                     <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
@@ -85,6 +137,39 @@
                     <ResizeGrip DockPanel.Dock="Bottom" HorizontalAlignment="Right" Cursor="ScrollWE" Name="ResizedGrip"/>
                 </DockPanel>
 
+            </Expander>
+
+            <Expander DockPanel.Dock="Top" Header="Csoportkezelés">
+                <DockPanel >
+                    <DockPanel DockPanel.Dock="Top">
+                        <Button DockPanel.Dock="Right" Content=" + " Command="{Binding Path=AddGroupCommand}" Margin="5,0,0,5" IsDefault="True"/>
+                        <TextBox Text="{Binding Path=GroupInput, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
+
+                    <ListView DockPanel.Dock="Top" 
+                              ItemsSource="{Binding Path=GroupItems}"
+                              SelectionMode="Single" 
+                              HorizontalContentAlignment="Stretch" 
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemTemplate>
+                            <DataTemplate >
+                                <Grid x:Name="Element" Height="23">
+                                    <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Text}"/>
+                                    <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
+                                            Command="{Binding Path=DataContext.RemoveGroupItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}}" 
+                                            CommandParameter="{Binding Path=.}"
+                                            />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
+                                        <Setter Property="Visibility" Value="Visible" TargetName="RemoveGroupButton"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                </DockPanel>
             </Expander>
         </DockPanel>
 

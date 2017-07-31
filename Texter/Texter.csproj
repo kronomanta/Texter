@@ -66,12 +66,20 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Config.cs" />
     <Compile Include="FileManager.cs" />
+    <Compile Include="Intefaces\IConfirmer.cs" />
+    <Compile Include="Intefaces\IWindowBase.cs" />
     <Compile Include="Logger\ILogger.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\LogHelper.cs" />
     <Compile Include="TextItem.cs" />
-    <Compile Include="VisualHelpers.cs" />
+    <Compile Include="ViewModels\GroupItem.cs" />
+    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\TextManager.cs" />
+    <Compile Include="ViewModels\TextManagerViewModel.Commands.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="View\Confirmer.cs" />
     <Compile Include="Win32Wrapper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

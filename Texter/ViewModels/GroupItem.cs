@@ -1,15 +1,15 @@
-﻿namespace Texter
+﻿namespace Texter.ViewModels
 {
-    public class TextItem : ViewModels.ViewModelBase
+    public class GroupItem : ViewModels.ViewModelBase
     {
-        private int _groupID;
-        public int GroupID
+        private int _id;
+        public int ID
         {
-            get { return _groupID; }
+            get { return _id; }
             set
             {
-                if (_groupID == value) return;
-                _groupID = value;
+                if (_id == value) return;
+                _id = value;
                 OnPropertyChanged();
             }
         }

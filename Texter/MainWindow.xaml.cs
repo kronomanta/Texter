@@ -1,18 +1,21 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using Texter.Intefaces;
 using Texter.Logger;
+using Texter.View;
+using Texter.ViewModels;
 
 namespace Texter
 {
     /// <summary>
     /// 
     /// </summary>
-    public partial class MainWindow
+    public partial class MainWindow : IWindowBase
     {
-        private ObservableCollection<TextItem> _textItems;
         private IntPtr _windowHandle;
+
+        private WindowState _tempPrevWindowState;
 
         public MainWindow()
         {
@@ -38,7 +41,6 @@ namespace Texter
             Header.MouseDown += HeaderMouserLeftDown;
 
             CloseButton.Click += CloseButtonClicked;
-            NewItemButton.Click += AddNewItemClicked;
             ResizedGrip.PreviewMouseDown += ResizeGripPreviewMouseDown;
         }
 
@@ -47,43 +49,19 @@ namespace Texter
             Header.MouseDown -= HeaderMouserLeftDown;
 
             CloseButton.Click -= CloseButtonClicked;
-            NewItemButton.Click -= AddNewItemClicked;
             ResizedGrip.PreviewMouseDown -= ResizeGripPreviewMouseDown;
         }
-
-        private void AddNewItemClicked(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(InputText.Text)) return;
-            _textItems.Add(new TextItem { Text = InputText.Text });
-            InputText.Text = null;
-        }
-
-        private void RemoveItemClicked(object sender, RoutedEventArgs e)
-        {
-            TextItem textItem = (sender as FrameworkElement)?.DataContext as TextItem;
-            if (textItem == null) return;
-            _textItems.Remove(textItem);
-        }
-
-        private async void TextItemClicked(object sender, RoutedEventArgs e)
+        
+        private void TextItemClicked(object sender, RoutedEventArgs e)
         {
             try
             {
+                //TODO
                 TextItem textItem = (sender as ListBoxItem)?.DataContext as TextItem;
-                if (textItem == null) return;
 
-                WindowState windowState = WindowState;
-
-                Hide();
-                WindowState = WindowState.Minimized;
-                await System.Threading.Tasks.Task.Run(() => System.Threading.Thread.Sleep(200));
-
-                IntPtr targetWindow = await Win32Wrapper.PasteText(textItem.Text, KeepOnClipboardAfterInsert.IsChecked.Value);
-
-                WindowState = windowState;
-                Show();
-
-                Win32Wrapper.SetForegroundWindow(targetWindow);
+                var pasteCommand = ((TextManagerViewModel)DataContext).PasteFromClipboardCommand;
+                if (pasteCommand.CanExecute(textItem))
+                    pasteCommand.Execute(textItem);
             }
             catch (Exception ex)
             {
@@ -104,7 +82,9 @@ namespace Texter
             base.OnInitialized(e);
             try
             {
-                TextList.ItemsSource = _textItems = System.Threading.Tasks.Task.Run(async () => await FileManager.LoadConfigAsync<ObservableCollection<TextItem>>()).Result ?? new ObservableCollection<TextItem>();
+                DataContext = new TextManagerViewModel(new Confirmer(), this);
+
+                ((TextManagerViewModel)DataContext).LoadItems();
             }
             catch (Exception ex)
             {
@@ -116,7 +96,7 @@ namespace Texter
         {
             try
             {
-                FileManager.SaveConfigAsync(_textItems).Wait();
+                ((TextManagerViewModel)DataContext).SaveItems();
 
                 Unsubcribe();
             }
@@ -148,6 +128,21 @@ namespace Texter
         {
             if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
                 DragMove();
+        }
+        
+        public void ShowWithPreservedState()
+        {
+            WindowState = _tempPrevWindowState;
+            Show();
+
+        }
+
+        public void HideWithPrevStatePreserved()
+        {
+            _tempPrevWindowState = WindowState;
+
+            Hide();
+            WindowState = WindowState.Minimized;
         }
     }
 }
