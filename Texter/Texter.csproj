@@ -71,6 +71,7 @@
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\LogHelper.cs" />
     <Compile Include="TextItem.cs" />
+    <Compile Include="VisualHelpers.cs" />
     <Compile Include="Win32Wrapper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

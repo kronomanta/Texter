@@ -17,10 +17,10 @@ namespace Texter
         public MainWindow()
         {
             InitializeComponent();
-            
+
             try
             {
-                EventManager.RegisterClassHandler(typeof(ListBoxItem), MouseLeftButtonDownEvent, new RoutedEventHandler(TextItemClicked));
+                Subscribe();
             }
             catch (Exception ex)
             {
@@ -29,6 +29,26 @@ namespace Texter
                 MessageBox.Show(error);
                 Close();
             }
+        }
+
+        private void Subscribe()
+        {
+            EventManager.RegisterClassHandler(typeof(ListBoxItem), MouseLeftButtonDownEvent, new RoutedEventHandler(TextItemClicked));
+
+            Header.MouseDown += HeaderMouserLeftDown;
+
+            CloseButton.Click += CloseButtonClicked;
+            NewItemButton.Click += AddNewItemClicked;
+            ResizedGrip.PreviewMouseDown += ResizeGripPreviewMouseDown;
+        }
+
+        private void Unsubcribe()
+        {
+            Header.MouseDown -= HeaderMouserLeftDown;
+
+            CloseButton.Click -= CloseButtonClicked;
+            NewItemButton.Click -= AddNewItemClicked;
+            ResizedGrip.PreviewMouseDown -= ResizeGripPreviewMouseDown;
         }
 
         private void AddNewItemClicked(object sender, RoutedEventArgs e)
@@ -94,10 +114,11 @@ namespace Texter
 
         protected override void OnClosed(EventArgs e)
         {
-
             try
             {
                 FileManager.SaveConfigAsync(_textItems).Wait();
+
+                Unsubcribe();
             }
             catch (Exception ex)
             {
@@ -105,14 +126,6 @@ namespace Texter
             }
 
             base.OnClosed(e);
-        }
-
-        private void Expander_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed)
-            {
-                DragMove();
-            }
         }
 
         private void CloseButtonClicked(object sender, RoutedEventArgs e)
@@ -126,9 +139,15 @@ namespace Texter
             _windowHandle = ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).Handle;
         }
 
-        private void ResizeGrip_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ResizeGripPreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Win32Wrapper.ResizeWindow(_windowHandle, Win32Wrapper.ResizeDirection.Right);
+        }
+
+        private void HeaderMouserLeftDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+                DragMove();
         }
     }
 }

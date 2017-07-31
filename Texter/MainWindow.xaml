@@ -28,10 +28,6 @@
                 <BeginStoryboard>
                     <Storyboard >
                         <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetProperty="Opacity"/>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentHolder" Storyboard.TargetProperty="(UIElement.Visibility)">
-                            <DiscreteObjectKeyFrame KeyTime="00:00:00" Value="{x:Static Visibility.Collapsed}"/>
-                            <DiscreteObjectKeyFrame KeyTime="00:00:0.2" Value="{x:Static Visibility.Visible}"/>
-                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>
@@ -39,61 +35,59 @@
                 <BeginStoryboard>
                     <Storyboard >
                         <DoubleAnimation Duration="0:0:0.2" To="0.2" Storyboard.TargetProperty="Opacity"/>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentHolder" Storyboard.TargetProperty="(UIElement.Visibility)">
-                            <DiscreteObjectKeyFrame KeyTime="00:00:0" Value="{x:Static Visibility.Visible}"/>
-                            <DiscreteObjectKeyFrame KeyTime="00:00:0.2" Value="{x:Static Visibility.Collapsed}"/>
-                        </ObjectAnimationUsingKeyFrames>
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>
         </Border.Triggers>
 
-
         <DockPanel >
-            
-            <Grid DockPanel.Dock="Top" MouseDown="Expander_MouseDown" Margin="0,0,0,5">
+            <Grid Margin="0,0,0,5" Name="Header" DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Texter" FontWeight="Bold" />
-                <Button Content="X" Background="Red" Grid.Column="1" Height="20" Width="20" Click="CloseButtonClicked"/>
+                <TextBlock Text="Texter" FontWeight="Bold" VerticalAlignment="Center"/>
+
+                <Button Content="X" Background="Red" Grid.Column="1" Height="20" Width="20" Name="CloseButton" VerticalAlignment="Center"/>
             </Grid>
 
-            <DockPanel DockPanel.Dock="Top" Name="ContentHolder" Visibility="Collapsed" >
-                <DockPanel DockPanel.Dock="Top">
-                    <Button DockPanel.Dock="Right" Content=" + " Click="AddNewItemClicked" Margin="5,0,0,5" />
-                    <TextBox AcceptsReturn="True" AcceptsTab="True" Name="InputText"
+
+            <Expander HorizontalAlignment="Stretch" Name="Expander" DockPanel.Dock="Top" Header="Vágólapkezelés" >
+                
+                <DockPanel >
+                    <DockPanel DockPanel.Dock="Top">
+                        <Button DockPanel.Dock="Right" Content=" + " Name="NewItemButton" Margin="5,0,0,5" IsDefault="True"/>
+                        <TextBox AcceptsTab="True" Name="InputText"
                      HorizontalAlignment="Stretch" MaxHeight="400"
                      TextWrapping="Wrap"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      />
+                    </DockPanel>
+
+                    <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" Name="KeepOnClipboardAfterInsert" Content="Vágólapon tart" IsThreeState="False"/>
+
+                    <ListView DockPanel.Dock="Top" Name="TextList" SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemTemplate>
+                            <DataTemplate >
+                                <Grid x:Name="Element" Height="23">
+                                    <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Text}"/>
+                                    <Button Content="X" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Top" x:Name="RemoveButton" Click="RemoveItemClicked" Width="20" Height="20" Visibility="Collapsed"/>
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
+                                        <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <ResizeGrip DockPanel.Dock="Bottom" HorizontalAlignment="Right" Cursor="ScrollWE" Name="ResizedGrip"/>
                 </DockPanel>
 
-                <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" Name="KeepOnClipboardAfterInsert" Content="Vágólapon tart" IsThreeState="False"/>
-
-                <ListView DockPanel.Dock="Top" Name="TextList" SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListView.ItemTemplate>
-                        <DataTemplate >
-                            <Grid x:Name="Element" Height="23">
-                                <TextBlock Text="{Binding Path=Text}" TextTrimming="CharacterEllipsis"/>
-                                <Button Content="X" Margin="1" HorizontalAlignment="Right" VerticalAlignment="Top" x:Name="RemoveButton" Click="RemoveItemClicked" Width="20" Height="20" Visibility="Collapsed"/>
-                            </Grid>
-                            <DataTemplate.Triggers>
-                                <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
-                                    <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
-                                </Trigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-
-                <ResizeGrip DockPanel.Dock="Bottom" HorizontalAlignment="Right" Cursor="ScrollWE"
-                        PreviewMouseDown="ResizeGrip_PreviewMouseDown"/>
-            </DockPanel>
-
-          
+            </Expander>
         </DockPanel>
+
     </Border>
 
 </Window>
