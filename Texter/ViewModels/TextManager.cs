@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Texter.Intefaces;
@@ -11,31 +12,18 @@ namespace Texter.ViewModels
         private readonly IConfirmer _confirmer;
         private readonly IWindowBase _window;
 
-        private ObservableCollection<TextItem> _textItems;
-        public ObservableCollection<TextItem> TextItems
+        private ObservableCollection<KeyValuePair<GroupItem, ObservableCollection<TextItem>>> _items;
+        public ObservableCollection<KeyValuePair<GroupItem, ObservableCollection<TextItem>>> Items
         {
-            get { return _textItems; }
-            private set
+            get { return _items; }
+            set
             {
-                if (_textItems == value) return;
-                _textItems = value;
-                OnPropertyChanged();
-                AddTextCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        private ObservableCollection<GroupItem> _groupItems;
-        public ObservableCollection<GroupItem> GroupItems
-        {
-            get { return _groupItems; }
-            private set
-            {
-                if (_groupItems == value) return;
-                _groupItems = value;
+                if (_items == value) return;
+                _items = value;
                 OnPropertyChanged();
             }
         }
-
+        
         private GroupItem _selectedGroup;
         public GroupItem SelectedGroup
         {
@@ -96,7 +84,14 @@ namespace Texter.ViewModels
         private void AddText()
         {
             if (string.IsNullOrWhiteSpace(TextInput)) return;
-            TextItems.Add(new TextItem(TextInput, SelectedGroup));
+
+            var group = Items.Where(x => x.Key == SelectedGroup).Select(x => x.Value).FirstOrDefault();
+            if (group == null)
+            {
+                Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(SelectedGroup, group = new ObservableCollection<TextItem>()));
+            }
+
+            group.Add(new TextItem(TextInput, SelectedGroup));
             TextInput = null;
             SelectedGroup = null;
         }
@@ -104,7 +99,10 @@ namespace Texter.ViewModels
         private void RemoveText(TextItem item)
         {
             if (item == null) return;
-            TextItems.Remove(item);
+            foreach (var group in Items)
+            {
+                if (group.Value.Remove(item)) return;
+            }
         }
 
         private void AddGroup()
@@ -112,7 +110,7 @@ namespace Texter.ViewModels
             if (string.IsNullOrWhiteSpace(GroupInput)) return;
 
             if (GetGroupByName(GroupInput) == null)
-                GroupItems.Add(new GroupItem { Text = GroupInput });
+                Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(new GroupItem { Text = GroupInput }, new ObservableCollection<TextItem>()));
 
             GroupInput = null;
         }
@@ -122,13 +120,19 @@ namespace Texter.ViewModels
             if (item == null) return;
 
             bool confirmed = true;
-            if (TextItems.Any(x => x.GroupName == item.Text))
+            if (Items.Single(x => x.Key == item).Value.Count >0)
                 confirmed = _confirmer.ConfirmYesNo($"Tartozik elem ehhez a csoporthoz: {item.Text}. Mégis törli?", "Kapcsolódó elemek törlése");
 
             if (confirmed)
             {
-                GroupItems.Remove(item);
-                TextItems = new ObservableCollection<TextItem>(TextItems.Where(x => x.GroupName != item.Text));
+                for (int i = 0; i < Items.Count; i++)
+                {
+                    if (Items[i].Key == item)
+                    {
+                        Items.RemoveAt(i);
+                        return;
+                    }
+                }
             }
         }
 
@@ -160,7 +164,7 @@ namespace Texter.ViewModels
         {
             try
             {
-                FileManager.SaveConfigAsync(new Config { GroupItems = GroupItems.ToArray(), TextItems = TextItems.ToArray() }).Wait();
+                FileManager.SaveConfigAsync(new Config { Groups = Items.Select(x => new ItemHolder { GroupItem = x.Key, TextItems = x.Value.ToArray() }).ToArray() }).Wait();
             }
             catch (Exception ex)
             {
@@ -182,14 +186,18 @@ namespace Texter.ViewModels
                 LogHelper.LogException(ex);
             }
 
-            GroupItems = new ObservableCollection<GroupItem>(config.GroupItems ?? new GroupItem[0]);
-            TextItems = new ObservableCollection<TextItem>(config.TextItems ?? new TextItem[0]);
+            if (config.Groups == null) config.Groups = new ItemHolder[0];
+            Items = new ObservableCollection<KeyValuePair<GroupItem, ObservableCollection<TextItem>>>();
+            foreach (var group in config.Groups)
+            {
+                Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(group.GroupItem, new ObservableCollection<TextItem>(group.TextItems ?? new TextItem[0])));
+            }
         }
 
         private GroupItem GetGroupByName(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return null;
-            return GroupItems.SingleOrDefault(x => x.Text.ToLower() == name.ToLower());
+            return Items.Where(x => x.Key != null && String.Compare(x.Key.Text, name, true) == 0).Select(x => x.Key).SingleOrDefault();
         }
     }
 }

@@ -4,7 +4,6 @@ namespace Texter
 {
     public class Config
     {
-        public TextItem[] TextItems;
-        public GroupItem[] GroupItems;
+        public ItemHolder[] Groups;
     }
 }
