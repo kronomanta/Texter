@@ -32,24 +32,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Border Opacity="0.2" BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
-        <Border.Triggers>
-
-            <EventTrigger RoutedEvent="Control.MouseEnter">
-                <BeginStoryboard>
-                    <Storyboard >
-                        <DoubleAnimation Duration="0:0:0.2" To="1" Storyboard.TargetProperty="Opacity"/>
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-            <EventTrigger RoutedEvent="Control.MouseLeave">
-                <BeginStoryboard>
-                    <Storyboard >
-                        <DoubleAnimation Duration="0:0:0.2" To="0.2" Storyboard.TargetProperty="Opacity"/>
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Border.Triggers>
+    <Border BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
 
         <DockPanel LastChildFill="False" >
             <Grid Margin="0,0,0,5" Name="Header" DockPanel.Dock="Top">
@@ -102,11 +85,12 @@
 
                     </Grid>
 
-                    <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" IsChecked="{Binding Path=KeepOnClipboardAfterInsert}" Content="Vágólapon tart" IsThreeState="False"/>
+                    <CheckBox DockPanel.Dock="Top" Margin="0,5,0,5" IsChecked="{Binding Path=KeepOnClipboardAfterInsert}" Content="Vágólapon tart" />
 
                     <ListBox DockPanel.Dock="Top" 
                               ItemsSource="{Binding Path=Items}"
-                              SelectionMode="Single" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              HorizontalContentAlignment="Stretch" 
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               IsSynchronizedWithCurrentItem="False"
                               x:Name="ItemHolder"
                               >
@@ -129,18 +113,16 @@
                                           dd:DragDrop.DragDirectlySelectedOnly="True"
                                               BorderThickness="0"
                                               HorizontalAlignment="Stretch"
-                                              HorizontalContentAlignment="Stretch"
                                                   >
                                         <ListBox.ItemTemplate>
 
                                             <DataTemplate >
                                                 <Grid x:Name="Element" Height="28">
-                                                    <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text}" HorizontalAlignment="Stretch"/>
+                                                    <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text}"/>
 
                                                     <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
                                                         Command="{Binding Path=DataContext.RemoveItemCommand, ElementName=RootLayout}" 
                                                         CommandParameter="{Binding Path=.}"
-                                                        VerticalAlignment="Center"
                                                         />
                                                 </Grid>
                                                 <DataTemplate.Triggers>
@@ -174,7 +156,6 @@
 
                     <ListBox DockPanel.Dock="Top" 
                               ItemsSource="{Binding Source={StaticResource GroupedTextItems}}"
-                              SelectionMode="Single" 
                               HorizontalContentAlignment="Stretch" 
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               IsSynchronizedWithCurrentItem="False"
@@ -187,7 +168,6 @@
                                     <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
                                             Command="{Binding Path=DataContext.RemoveGroupItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}" 
                                             CommandParameter="{Binding Path=Key}"
-                                                VerticalAlignment="Center"
                                             />
                                 </Grid>
                                 <DataTemplate.Triggers>
