@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Texter"
+        xmlns:vm="clr-namespace:Texter.ViewModels"
         
         mc:Ignorable="d"
         Title="Texter" 
@@ -89,6 +90,7 @@
 
                     <ListBox DockPanel.Dock="Top" 
                               ItemsSource="{Binding Path=Items}"
+                              SelectionMode="Single" 
                               HorizontalContentAlignment="Stretch" 
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               IsSynchronizedWithCurrentItem="False"
@@ -101,7 +103,7 @@
                                         <Grid HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}"  
                                             dd:DragDrop.IsDropTarget="True"
                                             dd:DragDrop.DropHandler="{Binding Path=DataContext, ElementName=ItemHolder}"
-                                            Tag="DropMarker">
+                                            Tag="{x:Static vm:Tags.DropToGroupHeaderMarker}">
 
                                             <TextBlock FontWeight="Bold" Text="{Binding Path=Key.Text}" Margin="5,0,0,0" ToolTip="{Binding Path=Key.Text}" />
                                         </Grid>
@@ -113,16 +115,18 @@
                                           dd:DragDrop.DragDirectlySelectedOnly="True"
                                               BorderThickness="0"
                                               HorizontalAlignment="Stretch"
+                                              HorizontalContentAlignment="Stretch"
                                                   >
                                         <ListBox.ItemTemplate>
 
                                             <DataTemplate >
                                                 <Grid x:Name="Element" Height="28">
-                                                    <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text}"/>
+                                                    <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text}" HorizontalAlignment="Stretch"/>
 
                                                     <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
                                                         Command="{Binding Path=DataContext.RemoveItemCommand, ElementName=RootLayout}" 
                                                         CommandParameter="{Binding Path=.}"
+                                                        VerticalAlignment="Center"
                                                         />
                                                 </Grid>
                                                 <DataTemplate.Triggers>
@@ -156,6 +160,7 @@
 
                     <ListBox DockPanel.Dock="Top" 
                               ItemsSource="{Binding Source={StaticResource GroupedTextItems}}"
+                              SelectionMode="Single" 
                               HorizontalContentAlignment="Stretch" 
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               IsSynchronizedWithCurrentItem="False"
@@ -168,6 +173,7 @@
                                     <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
                                             Command="{Binding Path=DataContext.RemoveGroupItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}" 
                                             CommandParameter="{Binding Path=Key}"
+                                                VerticalAlignment="Center"
                                             />
                                 </Grid>
                                 <DataTemplate.Triggers>

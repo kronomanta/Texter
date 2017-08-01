@@ -13,23 +13,5 @@
                 OnPropertyChanged();
             }
         }
-
-        private string _groupName;
-        public string GroupName
-        {
-            get { return _groupName; }
-            set
-            {
-                if (_groupName == value) return;
-                _groupName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public TextItem(string text, GroupItem group)
-        {
-            Text = text;
-            GroupName = group?.Text;
-        }
     }
 }

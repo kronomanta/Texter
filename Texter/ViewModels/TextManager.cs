@@ -107,7 +107,8 @@ namespace Texter.ViewModels
 
         private void AddGroup()
         {
-            if (string.IsNullOrWhiteSpace(GroupInput)) return;
+            if (string.IsNullOrWhiteSpace(GroupInput))
+                GroupInput = null;
 
             if (GetGroupByName(GroupInput) == null)
                 Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(new GroupItem { Text = GroupInput }, new ObservableCollection<TextItem>()));
@@ -196,8 +197,7 @@ namespace Texter.ViewModels
 
         private GroupItem GetGroupByName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return null;
-            return Items.Where(x => x.Key != null && String.Compare(x.Key.Text, name, true) == 0).Select(x => x.Key).SingleOrDefault();
+            return Items.Where(x => String.Compare(x.Key.Text, name, true) == 0).Select(x => x.Key).SingleOrDefault();
         }
     }
 }

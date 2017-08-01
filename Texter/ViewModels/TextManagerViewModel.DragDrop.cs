@@ -26,40 +26,12 @@ namespace Texter.ViewModels
                 else
                 {
                     //drag item to something
-
-                    if (dropInfo.TargetItem != null)
+                    if (DragDrop.DragDropHelper.HasValidTarget(dropInfo))
                     {
-
+                        dropInfo.Effects = DragDropEffects.Move;
                     }
-                    else if (dropInfo.TargetCollection != null)
-                    {
-
-                    }
-                    else
-                    {
-                        var targetVisual = dropInfo.VisualTargetItem as FrameworkElement;
-                        if (targetVisual != null)
-                        {
-                            if (targetVisual.Tag != null && targetVisual.Tag.ToString() == "DropMarker")
-                            {
-                                if (targetVisual.DataContext is KeyValuePair<GroupItem, ObservableCollection<TextItem>>)
-                                {
-                                    dropInfo.Effects = DragDropEffects.Move;
-                                }
-                            }
-                        }
-                    }
-
-
                 }
             }
-            else
-            {
-
-            }
-
-
-
         }
 
         void IDropTarget.Drop(IDropInfo dropInfo)
@@ -84,7 +56,7 @@ namespace Texter.ViewModels
                     var targetVisual = dropInfo.VisualTargetItem as FrameworkElement;
                     if (targetVisual != null)
                     {
-                        if (targetVisual.Tag != null && targetVisual.Tag.ToString() == "DropMarker")
+                        if (targetVisual.Tag != null && (Tags)targetVisual.Tag == Tags.DropToGroupHeaderMarker)
                         {
                             if (targetVisual.DataContext is KeyValuePair<GroupItem, ObservableCollection<TextItem>>)
                             {
@@ -96,8 +68,6 @@ namespace Texter.ViewModels
 
 
                 if (targetGroup == null) return;
-
-                dataItem.GroupName = targetGroup.Value.Key?.Text;
 
                 var insertIndex = dropInfo.InsertIndex != dropInfo.UnfilteredInsertIndex ? dropInfo.UnfilteredInsertIndex : dropInfo.InsertIndex;
 

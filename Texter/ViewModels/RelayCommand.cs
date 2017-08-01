@@ -7,6 +7,8 @@ namespace Texter.ViewModels
         private Func<bool> _canExecute;
         private Action _execute;
 
+        public RelayCommand(Action execute) : this(execute, null) { }
+
         public RelayCommand(Action execute, Func<bool> canExecute)
         {
             this._canExecute = canExecute;
@@ -21,7 +23,7 @@ namespace Texter.ViewModels
 
         public bool CanExecute(object parameter)
         {
-            return _canExecute();
+            return _canExecute == null || _canExecute();
         }
 
         public void Execute(object parameter)

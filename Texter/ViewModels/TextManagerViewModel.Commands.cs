@@ -3,7 +3,7 @@
     public partial class TextManagerViewModel
     {
         private RelayCommand _addGroupCommand;
-        public RelayCommand AddGroupCommand => _addGroupCommand ?? (_addGroupCommand = new RelayCommand(AddGroup, () => !string.IsNullOrWhiteSpace(GroupInput)));
+        public RelayCommand AddGroupCommand => _addGroupCommand ?? (_addGroupCommand = new RelayCommand(AddGroup));
 
         private RelayCommand _addTextCommand;
         public RelayCommand AddTextCommand => _addTextCommand ?? (_addTextCommand = new RelayCommand(AddText, () => !string.IsNullOrWhiteSpace(TextInput)));
