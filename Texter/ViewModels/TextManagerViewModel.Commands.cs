@@ -1,4 +1,6 @@
-﻿namespace Texter.ViewModels
+﻿using System;
+
+namespace Texter.ViewModels
 {
     public partial class TextManagerViewModel
     {
@@ -18,7 +20,11 @@
         public RelayCommand<TextItem> PasteFromClipboardCommand => _pasteFromClipboardCommand ?? (_pasteFromClipboardCommand = new RelayCommand<TextItem>(PasteFromClipboard, ti => ti != null));
 
 
-        
+        private RelayCommand _openConfigCommand;
+        public RelayCommand OpenConfigCommand => _openConfigCommand ?? (_openConfigCommand = new RelayCommand(async () => await OpenConfig()));
+
+        private RelayCommand _saveConfigCommand;
+        public RelayCommand SaveConfigCommand => _saveConfigCommand ?? (_saveConfigCommand = new RelayCommand(async () => await SaveConfig()));
 
     }
 }

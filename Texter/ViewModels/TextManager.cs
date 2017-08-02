@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Forms;
 using Texter.Intefaces;
 using Texter.Logger;
 
@@ -23,7 +24,7 @@ namespace Texter.ViewModels
                 OnPropertyChanged();
             }
         }
-        
+
         private GroupItem _selectedGroup;
         public GroupItem SelectedGroup
         {
@@ -144,7 +145,7 @@ namespace Texter.ViewModels
             {
                 string error = Localization.TranslationManager.Instance.TranslateString("ErrorMessagePasterFromClipboard");
                 LogHelper.LogException(ex, error);
-                _confirmer.ConfirmStop(error, Localization.TranslationManager.Instance.TranslateString("ErrorMessageCaption"));
+                confirmer.ConfirmStop(error);
             }
         }
 
@@ -152,7 +153,7 @@ namespace Texter.ViewModels
         {
             try
             {
-                FileManager.SaveConfigAsync(new Config { Groups = Items.Select(x => new ItemHolder { GroupItem = x.Key, TextItems = x.Value.ToArray() }).ToArray() }).Wait();
+                SaveConfigToFileAsync(null);
             }
             catch (Exception ex)
             {
@@ -162,11 +163,76 @@ namespace Texter.ViewModels
 
         public void LoadItems()
         {
+            try
+            {
+                LoadConfigFromFileAsync(null);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex);
+            }
+        }
+
+
+        private async System.Threading.Tasks.Task OpenConfig()
+        {
+            try
+            {
+                OpenFileDialog dlg = new OpenFileDialog
+                {
+                    CheckFileExists = true,
+                    Filter = "Texter file (*.ttr)|*.ttr"
+                };
+
+                if (dlg.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dlg.FileName))
+                {
+                    await LoadConfigFromFileAsync(dlg.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex);
+                _confirmer.ConfirmStop(ex.Message);
+            }
+        }
+
+        private async System.Threading.Tasks.Task SaveConfig()
+        {
+            try
+            {
+                SaveFileDialog dlg = new SaveFileDialog
+                {
+                    ValidateNames = true,
+                    AddExtension = true,
+                    DefaultExt = "ttr",
+                    Filter = "Texter file (*.ttr)|*.ttr",
+                    FileName = "Texter_" + DateTime.Now.ToString("yyyyMMdd_HHmm")
+                };
+
+                if (dlg.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dlg.FileName))
+                {
+                    await SaveConfigToFileAsync(dlg.FileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex);
+                _confirmer.ConfirmStop(ex.Message);
+            }
+        }
+
+        private async System.Threading.Tasks.Task SaveConfigToFileAsync(string path)
+        {
+            await FileManager.SaveConfigAsync(new Config { Groups = Items.Select(x => new ItemHolder { GroupItem = x.Key, TextItems = x.Value.ToArray() }).ToArray() }, path);
+        }
+
+        private async System.Threading.Tasks.Task LoadConfigFromFileAsync(string path)
+        {
             Config config;
 
             try
             {
-                config = System.Threading.Tasks.Task.Run(async () => await FileManager.LoadConfigAsync<Config>()).Result ?? new Config();
+                config = (await FileManager.LoadConfigAsync<Config>(path)) ?? new Config();
             }
             catch (Exception ex)
             {
@@ -181,5 +247,6 @@ namespace Texter.ViewModels
                 Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(group.GroupItem, new ObservableCollection<TextItem>(group.TextItems ?? new TextItem[0])));
             }
         }
+
     }
 }

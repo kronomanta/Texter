@@ -29,7 +29,7 @@ namespace Texter.Views
             {
                 string error = Localization.TranslationManager.Instance.TranslateString("ErrorMessageInitialization");
                 LogHelper.LogException(ex, error);
-                _confirmer.ConfirmStop(error, Localization.TranslationManager.Instance.TranslateString("ErrorMessageCaption"));
+                confirmer.ConfirmStop(error);
                 Close();
             }
         }

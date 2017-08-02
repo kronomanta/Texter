@@ -30,6 +30,8 @@
     
     <Window.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding Path=AddGroupCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding Path=OpenConfigCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding Path=SaveConfigCommand}" />
     </Window.InputBindings>
 
     <Border BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
@@ -56,6 +58,8 @@
                     <Menu IsMainMenu="True" DockPanel.Dock="Top" Background="Transparent" Margin="0,5,0,5">
                         <MenuItem Header="{l:Translate MenuFile}">
                             <MenuItem Header="{l:Translate MenuFile.NewGroup}" InputGestureText="Ctrl+N" Command="{Binding Path=AddGroupCommand}" />
+                            <MenuItem Header="{l:Translate MenuFile.OpenConfig}" InputGestureText="Ctrl+O" Command="{Binding Path=OpenConfigCommand}" />
+                            <MenuItem Header="{l:Translate MenuFile.SaveConfig}" InputGestureText="Ctrl+S" Command="{Binding Path=SaveConfigCommand}" />
                         </MenuItem>
                     </Menu>
 

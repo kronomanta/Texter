@@ -150,6 +150,12 @@
   <data name="MenuFile.NewGroup" xml:space="preserve">
     <value>_Új csoport</value>
   </data>
+  <data name="MenuFile.OpenConfig" xml:space="preserve">
+    <value>Készlet _betöltése</value>
+  </data>
+  <data name="MenuFile.SaveConfig" xml:space="preserve">
+    <value>Készlet _mentése</value>
+  </data>
   <data name="NoText" xml:space="preserve">
     <value>Nem</value>
   </data>

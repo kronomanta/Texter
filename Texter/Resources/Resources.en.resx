@@ -151,6 +151,12 @@ Are you sure to delete?</value>
   <data name="MenuFile.NewGroup" xml:space="preserve">
     <value>_New group</value>
   </data>
+  <data name="MenuFile.OpenConfig" xml:space="preserve">
+    <value>_Load collection</value>
+  </data>
+  <data name="MenuFile.SaveConfig" xml:space="preserve">
+    <value>_Save collection</value>
+  </data>
   <data name="NoText" xml:space="preserve">
     <value>No</value>
   </data>

@@ -246,7 +246,7 @@ namespace Texter.Controls.Confirmer.WPFMessageBox
             string title, string message, string innerMessage,
             WPFMessageBoxButtons buttonOption, WPFMessageBoxImage image)
         {
-            Title = title;
+            Title = title ?? Localization.TranslationManager.Instance.TranslateString("ErrorMessageCaption");
             Message = message;
             InnerMessageDetails = innerMessage;
             InitDefaultButtonTexts();

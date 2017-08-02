@@ -27,6 +27,11 @@ namespace Texter.Controls.Confirmer
             WPFMessageBoxResult result = WPFMessageBox.WPFMessageBox.Show(caption, message, WPFMessageBoxButtons.OK, WPFMessageBoxImage.Error);
         }
 
+        public void ConfirmStop(string message)
+        {
+            ConfirmStop(message, null);
+        }
+
         public bool ConfirmYesNo(string message, string caption, string yesText, string noText)
         {
             var options = new Dictionary<WPFMessageBoxResult, string>

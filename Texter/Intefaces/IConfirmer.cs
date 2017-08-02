@@ -4,6 +4,7 @@
     {
         void ConfirmOK(string message, string caption);
         void ConfirmStop(string message, string caption);
+        void ConfirmStop(string message);
 
         bool ConfirmYesNo(string message, string caption);
         bool ConfirmYesNo(string message, string caption, string yesText, string noText);

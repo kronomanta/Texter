@@ -29,14 +29,14 @@ namespace Texter
             }
         }
 
-        public static async Task SaveConfigAsync<T>(T data)
+        public static async Task SaveConfigAsync<T>(T data, string path = null)
         {
-            await SaveAsync(_configPath, data);
+            await SaveAsync(path ?? _configPath, data);
         }
 
-        public static async Task<T> LoadConfigAsync<T>()
+        public static async Task<T> LoadConfigAsync<T>(string path = null)
         {
-            return await LoadAsync<T>(_configPath);
+            return await LoadAsync<T>(path ?? _configPath);
         }
     }
 }

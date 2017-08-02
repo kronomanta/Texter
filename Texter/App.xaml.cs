@@ -23,8 +23,7 @@ namespace Texter
         {
             string error = TranslationManager.Instance.TranslateString("ErrorMessageFatal");
             LogHelper.LogException(e, error);
-            new Controls.Confirmer.MessageBoxConfirmer().ConfirmStop(error, TranslationManager.Instance.TranslateString("ErrorMessageCaption"));
-            MessageBox.Show(error);
+            new Controls.Confirmer.MessageBoxConfirmer().ConfirmStop(error);
             Environment.Exit(-1);
         }
     }
