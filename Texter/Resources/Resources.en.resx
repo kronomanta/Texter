@@ -139,6 +139,9 @@ Are you sure to delete?</value>
   <data name="ErrorMessageInitialization" xml:space="preserve">
     <value>Initialization failed. Please, restart the application. [ERR400]</value>
   </data>
+  <data name="ErrorMessageInvalidFileFormat" xml:space="preserve">
+    <value>Invalid file format</value>
+  </data>
   <data name="ErrorMessagePasterFromClipboard" xml:space="preserve">
     <value>Failed to insert the text. [ERR202]</value>
   </data>

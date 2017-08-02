@@ -236,8 +236,14 @@ namespace Texter.ViewModels
             }
             catch (Exception ex)
             {
-                config = new Config();
                 LogHelper.LogException(ex);
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    //import error
+                    _confirmer.ConfirmStop(Localization.TranslationManager.Instance.TranslateString("ErrorMessageInvalidFileFormat"));
+                    return;
+                }
+                config = new Config();
             }
 
             if (config.Groups == null) config.Groups = new ItemHolder[0];

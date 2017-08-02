@@ -138,6 +138,9 @@
   <data name="ErrorMessageInitialization" xml:space="preserve">
     <value>Sikertelen az alkalmazás inicializálása. Kérem, indítsa újra. [ERR400]</value>
   </data>
+  <data name="ErrorMessageInvalidFileFormat" xml:space="preserve">
+    <value>Érvénytelen fájlformátum</value>
+  </data>
   <data name="ErrorMessagePasterFromClipboard" xml:space="preserve">
     <value>Sikertelen a szöveg beillesztése. [ERR202]</value>
   </data>
