@@ -106,7 +106,6 @@
 
                     <ListBox DockPanel.Dock="Top" 
                               ItemsSource="{Binding Path=Items}"
-                              SelectionMode="Single" 
                               HorizontalContentAlignment="Stretch" 
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               IsSynchronizedWithCurrentItem="False"
@@ -147,6 +146,7 @@
                                               BorderThickness="0"
                                               HorizontalAlignment="Stretch"
                                               HorizontalContentAlignment="Stretch"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                   >
                                         <ListBox.ItemTemplate>
 
