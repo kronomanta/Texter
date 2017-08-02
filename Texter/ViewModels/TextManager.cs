@@ -104,8 +104,12 @@ namespace Texter.ViewModels
             if (item == null) return;
 
             bool confirmed = true;
-            if (Items.Single(x => x.Key == item).Value.Count >0)
-                confirmed = _confirmer.ConfirmYesNo($"Tartozik elem ehhez a csoporthoz: {item.Text}. Mégis törli?", "Kapcsolódó elemek törlése");
+            if (Items.Single(x => x.Key == item).Value.Count > 0)
+            {
+                confirmed = _confirmer.ConfirmYesNo(
+                    string.Format(Localization.TranslationManager.Instance.TranslateString("DeleteGroupWithConnectionElements"), item.Text),
+                    Localization.TranslationManager.Instance.TranslateString("DeleteGroupWithConnectionElementsHeader"));
+            }
 
             if (confirmed)
             {
@@ -138,9 +142,9 @@ namespace Texter.ViewModels
             }
             catch (Exception ex)
             {
-                string error = "Sikertelen a szöveg beillesztése. [ERR202]";
+                string error = Localization.TranslationManager.Instance.TranslateString("ErrorMessagePasterFromClipboard");
                 LogHelper.LogException(ex, error);
-                _confirmer.ConfirmStop(error, "Hiba");
+                _confirmer.ConfirmStop(error, Localization.TranslationManager.Instance.TranslateString("ErrorMessageCaption"));
             }
         }
 

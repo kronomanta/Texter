@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using Texter.Localization;
 using Texter.Logger;
 
 namespace Texter
@@ -13,12 +14,16 @@ namespace Texter
         {
             DispatcherUnhandledException += (s,e) => HandleUnhandledException(e.Exception);
             AppDomain.CurrentDomain.UnhandledException += (s,e) => HandleUnhandledException(e.ExceptionObject as Exception);
+
+            TranslationManager.Instance.TranslationProvider = new ResxTranslationProvider("Texter.Resources.Resources", System.Reflection.Assembly.GetExecutingAssembly());
+            //System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
         }
 
         private void HandleUnhandledException(Exception e)
         {
-            string error = "Végzetes hiba történt. [ERR5002]";
+            string error = TranslationManager.Instance.TranslateString("ErrorMessageFatal");
             LogHelper.LogException(e, error);
+            new Controls.Confirmer.MessageBoxConfirmer().ConfirmStop(error, TranslationManager.Instance.TranslateString("ErrorMessageCaption"));
             MessageBox.Show(error);
             Environment.Exit(-1);
         }

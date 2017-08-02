@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -10,9 +9,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Texter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Tibor Kanyo")]
 [assembly: AssemblyProduct("Texter")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright Tibor Kanyo ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -28,7 +27,7 @@ using System.Windows;
 //the NeutralResourceLanguage attribute below.  Update the "en-US" in
 //the line below to match the UICulture setting in the project file.
 
-//[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
+//[assembly: NeutralResourcesLanguage("hu-HU", UltimateResourceFallbackLocation.Satellite)]
 
 
 [assembly: ThemeInfo(

@@ -3,16 +3,16 @@ using System.Windows;
 using System.Windows.Input;
 using Texter.Intefaces;
 using Texter.Logger;
-using Texter.View;
 using Texter.ViewModels;
 
-namespace Texter
+namespace Texter.Views
 {
     /// <summary>
     /// 
     /// </summary>
     public partial class MainWindow : IWindowBase
     {
+        private IConfirmer _confirmer;
         private IntPtr _windowHandle;
 
         private WindowState _tempPrevWindowState;
@@ -27,9 +27,9 @@ namespace Texter
             }
             catch (Exception ex)
             {
-                string error = "Sikertelen az alkalmazás inicializálása. Kérem, indítsa újra. [ERR400]";
+                string error = Localization.TranslationManager.Instance.TranslateString("ErrorMessageInitialization");
                 LogHelper.LogException(ex, error);
-                MessageBox.Show(error);
+                _confirmer.ConfirmStop(error, Localization.TranslationManager.Instance.TranslateString("ErrorMessageCaption"));
                 Close();
             }
         }
@@ -58,7 +58,9 @@ namespace Texter
             base.OnInitialized(e);
             try
             {
-                DataContext = new TextManagerViewModel(new Confirmer(), this);
+                _confirmer = new Controls.Confirmer.MessageBoxConfirmer();
+
+                DataContext = new TextManagerViewModel(_confirmer, this);
 
                 ((TextManagerViewModel)DataContext).LoadItems();
             }
@@ -95,7 +97,7 @@ namespace Texter
             _windowHandle = ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).Handle;
         }
 
-        private void ResizeGripPreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ResizeGripPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Win32Wrapper.ResizeWindow(_windowHandle, Win32Wrapper.ResizeDirection.Right);
         }
@@ -105,7 +107,6 @@ namespace Texter
         {
             SizeToContent = SizeToContent.Height;
         }
-
 
         private void HeaderMouserLeftDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
