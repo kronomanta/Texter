@@ -145,7 +145,7 @@ namespace Texter.ViewModels
             {
                 string error = Localization.TranslationManager.Instance.TranslateString("ErrorMessagePasterFromClipboard");
                 LogHelper.LogException(ex, error);
-                confirmer.ConfirmStop(error);
+                _confirmer.ConfirmStop(error);
             }
         }
 
