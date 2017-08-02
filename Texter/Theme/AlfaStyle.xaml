@@ -71,11 +71,4 @@
         <Setter Property="Command" Value="{Binding Path=DataContext.PasteFromClipboardCommand, ElementName=RootLayout}" />
         <Setter Property="CommandParameter" Value="{Binding}" />
     </Style>
-
-    <CollectionViewSource x:Key="GroupedTextItems" Source="{Binding Path=Items}">
-        <CollectionViewSource.GroupDescriptions>
-            <PropertyGroupDescription PropertyName="Key" />
-        </CollectionViewSource.GroupDescriptions>
-    </CollectionViewSource>
-
 </ResourceDictionary>

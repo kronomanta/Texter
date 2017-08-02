@@ -29,6 +29,7 @@ namespace Texter.Controls
             _textBox.AcceptsReturn = true;
             _textBox.MaxLength = adornedElement.MaxLength;
             _textBox.KeyUp += _textBox_KeyUp;
+            _textBox.ContextMenu = null;
             _collection.Add(_textBox);
         }
 

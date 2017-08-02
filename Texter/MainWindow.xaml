@@ -33,23 +33,38 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding Path=AddGroupCommand}" />
+    </Window.InputBindings>
 
     <Border BorderThickness="2" Background="White" BorderBrush="Black" Padding="5">
 
         <DockPanel LastChildFill="False" >
-            <Grid Margin="0,0,0,5" Name="Header" DockPanel.Dock="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Texter" FontWeight="Bold" VerticalAlignment="Center"/>
+            <Expander DockPanel.Dock="Top">
+                <Expander.Header>
+                    <Grid Name="Header" 
+                          HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}"
+                          >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Texter" FontWeight="Bold" VerticalAlignment="Center"/>
 
-                <Button Content="X" Background="Red" Grid.Column="1" Height="20" Width="20" Name="CloseButton" VerticalAlignment="Center"/>
-            </Grid>
+                        <Button Content="X" Background="Red" Grid.Column="1" Height="20" Width="20" Name="CloseButton" VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+
+                <StackPanel Orientation="Vertical">
 
 
-            <Expander DockPanel.Dock="Top" Header="Vágólapkezelés" x:Name="ClipboardManager">
-                <DockPanel LastChildFill="False">
+                    <Menu IsMainMenu="True" DockPanel.Dock="Top" Background="Transparent" Margin="0,5,0,5">
+                        <MenuItem Header="_Fájl">
+                            <MenuItem Header="_Új csoport" InputGestureText="Ctrl+N" Command="{Binding Path=AddGroupCommand}" />
+                        </MenuItem>
+                    </Menu>
+
+
                     <Grid DockPanel.Dock="Top">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -67,7 +82,7 @@
                                         <ComboBox x:Name="cb" ItemsSource="{Binding}"
                                                   DisplayMemberPath="Key.Text" 
                                                   SelectedValuePath="Key"
-                                                  SelectedValue="{Binding Path=DataContext.SelectedGroup, ElementName=ClipboardManager}"/>
+                                                  SelectedValue="{Binding Path=DataContext.SelectedGroup, ElementName=RootLayout}"/>
                                         <TextBlock x:Name="tb" Text="Válasszon csoportot" IsHitTestVisible="False" Visibility="Hidden"/>
                                     </Grid>
                                     <DataTemplate.Triggers>
@@ -99,16 +114,31 @@
                               >
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Expander IsExpanded="True" BorderBrush="#FFA4B97F" BorderThickness="0,0,0,1" Margin="0,5,0,5">
-                                    <Expander.Header>
-                                        <Grid HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}"  
+                                <Expander IsExpanded="True" BorderBrush="#FFA4B97F" BorderThickness="0,0,0,1" Margin="0,5,0,5" Header="{Binding}">
+                                    <Expander.HeaderTemplate>
+                                        <DataTemplate>
+                                            <Grid x:Name="GroupHeader"
+                                                  HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}"
                                             dd:DragDrop.IsDropTarget="True"
                                             dd:DragDrop.DropHandler="{Binding Path=DataContext, ElementName=ItemHolder}"
-                                            Tag="{x:Static vm:Tags.DropToGroupHeaderMarker}">
+                                            Tag="{x:Static vm:Tags.DropToGroupHeaderMarker}"
+                                                  Height="25">
 
-                                            <controls:EditableTextBlock FontWeight="Bold" Text="{Binding Path=Key.Text, Mode=TwoWay}" Margin="5,0,0,0" ToolTip="{Binding Path=Key.Text}" />
-                                        </Grid>
-                                    </Expander.Header>
+                                                <TextBlock FontWeight="Bold" Text="{Binding Path=DataContext.Key.Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" ToolTip="{Binding Path=Key.Text}" />
+                                                <controls:EditableTextBlock FontWeight="Bold" Text="{Binding Path=DataContext.Key.Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" ToolTip="{Binding Path=Key.Text}" />
+
+                                                <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
+                                                        Command="{Binding Path=DataContext.RemoveGroupItemCommand, ElementName=RootLayout}" 
+                                                        CommandParameter="{Binding Path=Key}"
+                                                        />
+                                            </Grid>
+                                            <DataTemplate.Triggers>
+                                                <Trigger SourceName="GroupHeader" Property="IsMouseOver" Value="True" >
+                                                    <Setter Property="Visibility" Value="Visible" TargetName="RemoveButton"/>
+                                                </Trigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </Expander.HeaderTemplate>
                                     <ListBox ItemsSource="{Binding Path=Value}"
                                            dd:DragDrop.IsDragSource="True"
                                           dd:DragDrop.IsDropTarget="True"
@@ -148,46 +178,11 @@
                     </ListBox>
 
                     <ResizeGrip DockPanel.Dock="Bottom" HorizontalAlignment="Right" Cursor="ScrollWE" Name="ResizedGrip"/>
-                </DockPanel>
+
+                </StackPanel>
 
             </Expander>
 
-            <Expander DockPanel.Dock="Top" Header="Csoportkezelés">
-                <DockPanel >
-                    <DockPanel DockPanel.Dock="Top">
-                        <Button DockPanel.Dock="Right" Content=" + " Command="{Binding Path=AddGroupCommand}" Margin="5,0,0,5" IsDefault="True"/>
-                        <TextBox Text="{Binding Path=GroupInput, UpdateSourceTrigger=PropertyChanged}" />
-                    </DockPanel>
-
-                    <ListBox DockPanel.Dock="Top" 
-                              ItemsSource="{Binding Source={StaticResource GroupedTextItems}}"
-                              SelectionMode="Single" 
-                              HorizontalContentAlignment="Stretch" 
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                              IsSynchronizedWithCurrentItem="False"
-                              >
-                        <ListBox.ItemTemplate>
-                            <DataTemplate >
-                                <Grid x:Name="Element" Height="28">
-                                    <controls:EditableTextBlock  Text="{Binding Path=Key.Text, Mode=TwoWay}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Key.Text}"/>
-
-                                    <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
-                                            Command="{Binding Path=DataContext.RemoveGroupItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}" 
-                                            CommandParameter="{Binding Path=Key}"
-                                                VerticalAlignment="Center"
-                                            />
-                                </Grid>
-                                <DataTemplate.Triggers>
-                                    <Trigger SourceName="Element" Property="IsMouseOver" Value="True" >
-                                        <Setter Property="Visibility" Value="Visible" TargetName="RemoveGroupButton"/>
-                                    </Trigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                </DockPanel>
-            </Expander>
         </DockPanel>
 
     </Border>

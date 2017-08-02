@@ -50,19 +50,6 @@ namespace Texter.ViewModels
             }
         }
 
-        private string _groupInput;
-        public string GroupInput
-        {
-            get { return _groupInput; }
-            set
-            {
-                if (_groupInput == value) return;
-                _groupInput = value;
-                OnPropertyChanged();
-                AddGroupCommand.RaiseCanExecuteChanged();
-            }
-        }
-
         private bool _keepOnClipboardAfterInsert;
         public bool KeepOnClipboardAfterInsert
         {
@@ -107,13 +94,7 @@ namespace Texter.ViewModels
 
         private void AddGroup()
         {
-            if (string.IsNullOrWhiteSpace(GroupInput))
-                GroupInput = null;
-
-            if (GetGroupByName(GroupInput) == null)
-                Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(new GroupItem { Text = GroupInput }, new ObservableCollection<TextItem>()));
-
-            GroupInput = null;
+            Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(new GroupItem(), new ObservableCollection<TextItem>()));
         }
 
         private void RemoveGroupItem(GroupItem item)
@@ -193,11 +174,6 @@ namespace Texter.ViewModels
             {
                 Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(group.GroupItem, new ObservableCollection<TextItem>(group.TextItems ?? new TextItem[0])));
             }
-        }
-
-        private GroupItem GetGroupByName(string name)
-        {
-            return Items.Where(x => String.Compare(x.Key?.Text, name, true) == 0).Select(x => x.Key).SingleOrDefault();
         }
     }
 }
