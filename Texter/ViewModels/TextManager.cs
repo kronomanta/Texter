@@ -72,10 +72,12 @@ namespace Texter.ViewModels
         {
             if (string.IsNullOrWhiteSpace(TextInput)) return;
 
-            var group = Items.Where(x => x.Key == SelectedGroup).Select(x => x.Value).FirstOrDefault();
+            GroupItem groupItem = SelectedGroup ?? Items.Where(x => string.IsNullOrEmpty(x.Key.Text)).Select(x => x.Key).FirstOrDefault() ?? new GroupItem();
+
+            var group = Items.Where(x => x.Key == groupItem).Select(x => x.Value).FirstOrDefault();
             if (group == null)
             {
-                Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(SelectedGroup, group = new ObservableCollection<TextItem>()));
+                Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(groupItem, group = new ObservableCollection<TextItem>()));
             }
 
             group.Add(new TextItem { Text = TextInput });
