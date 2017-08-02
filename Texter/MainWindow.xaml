@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Texter"
         xmlns:vm="clr-namespace:Texter.ViewModels"
+        xmlns:controls="clr-namespace:Texter.Controls"
         
         mc:Ignorable="d"
         Title="Texter" 
@@ -105,7 +106,7 @@
                                             dd:DragDrop.DropHandler="{Binding Path=DataContext, ElementName=ItemHolder}"
                                             Tag="{x:Static vm:Tags.DropToGroupHeaderMarker}">
 
-                                            <TextBlock FontWeight="Bold" Text="{Binding Path=Key.Text}" Margin="5,0,0,0" ToolTip="{Binding Path=Key.Text}" />
+                                            <controls:EditableTextBlock FontWeight="Bold" Text="{Binding Path=Key.Text, Mode=TwoWay}" Margin="5,0,0,0" ToolTip="{Binding Path=Key.Text}" />
                                         </Grid>
                                     </Expander.Header>
                                     <ListBox ItemsSource="{Binding Path=Value}"
@@ -120,8 +121,8 @@
                                         <ListBox.ItemTemplate>
 
                                             <DataTemplate >
-                                                <Grid x:Name="Element" Height="28">
-                                                    <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text}" HorizontalAlignment="Stretch"/>
+                                                <Grid x:Name="Element">
+                                                    <Button Style="{StaticResource TextButton}" Content="{Binding Path=Text, Mode=TwoWay}" />
 
                                                     <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveButton" 
                                                         Command="{Binding Path=DataContext.RemoveItemCommand, ElementName=RootLayout}" 
@@ -168,7 +169,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate >
                                 <Grid x:Name="Element" Height="28">
-                                    <TextBlock Text="{Binding Path=Key.Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Key.Text}"/>
+                                    <controls:EditableTextBlock  Text="{Binding Path=Key.Text, Mode=TwoWay}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path=Key.Text}"/>
 
                                     <Button Style="{StaticResource ResourceKey=RemoveButton}" x:Name="RemoveGroupButton" 
                                             Command="{Binding Path=DataContext.RemoveGroupItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}" 

@@ -91,7 +91,7 @@ namespace Texter.ViewModels
                 Items.Add(new KeyValuePair<GroupItem, ObservableCollection<TextItem>>(SelectedGroup, group = new ObservableCollection<TextItem>()));
             }
 
-            group.Add(new TextItem(TextInput, SelectedGroup));
+            group.Add(new TextItem { Text = TextInput });
             TextInput = null;
             SelectedGroup = null;
         }
@@ -197,7 +197,7 @@ namespace Texter.ViewModels
 
         private GroupItem GetGroupByName(string name)
         {
-            return Items.Where(x => String.Compare(x.Key.Text, name, true) == 0).Select(x => x.Key).SingleOrDefault();
+            return Items.Where(x => String.Compare(x.Key?.Text, name, true) == 0).Select(x => x.Key).SingleOrDefault();
         }
     }
 }
